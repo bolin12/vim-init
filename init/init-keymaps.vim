@@ -236,23 +236,32 @@ let g:asyncrun_open = 6
 " 任务结束时候响铃提醒
 let g:asyncrun_bell = 1
 
-" 设置 F10 打开/关闭 Quickfix 窗口
-nnoremap <F10> :call asyncrun#quickfix_toggle(6)<cr>
+" cancel 设置 F9 打开/关闭 Quickfix 窗口
+"nnoremap <F9> :call asyncrun#quickfix_toggle(6)<cr>
 
-" F9 编译 C/C++ 文件
+" F5 编译 and run  C/C++ 文件
 nnoremap <silent> <F9> :AsyncRun g++ -Wall -O2 "$(VIM_FILEPATH)" -o "$(VIM_FILEDIR)/$(VIM_FILENOEXT)" && ./$(VIM_FILENOEXT)<cr>
 
+" F9 run NERDTree
+nnoremap <silent> <F9> :wa<CR>:NERDTreeToggle<CR><C-w>l:Vista!!<CR><C-w>h
+vmap <F9> <ESC><F9>
+imap <F9> <ESC><F9>
+tmap <F9> <ESC><F9>
+nnoremap <silent> <S-F9> :wa<CR>:QFix<CR>
+vmap <S-F9> <ESC><S-F9>
+imap <S-F9> <ESC><S-F9>
+tmap <S-F9> <ESC><S-F9>
 " F5 运行文件
-nnoremap <silent> <F5> :call ExecuteFile()<cr>
+"nnoremap <silent> <F5> :call ExecuteFile()<cr>
 
 " F7 编译项目
-nnoremap <silent> <F7> :AsyncRun -cwd=<root> make <cr>
+"nnoremap <silent> <F7> :AsyncRun -cwd=<root> make <cr>
 
 " F8 运行项目
-nnoremap <silent> <F8> :AsyncRun -cwd=<root> -raw make run <cr>
+"nnoremap <silent> <F8> :AsyncRun -cwd=<root> -raw make run <cr>
 
 " F6 测试项目
-nnoremap <silent> <F6> :AsyncRun -cwd=<root> -raw make test <cr>
+"nnoremap <silent> <F6> :AsyncRun -cwd=<root> -raw make test <cr>
 
 " cancel 更新 cmake
 "nnoremap <silent> <F4> :AsyncRun -cwd=<root> cmake . <cr>
@@ -262,7 +271,17 @@ vmap <F4> <ESC><F4>
 imap <F4> <ESC><F4>
 tmap <F4> <ESC><F4>
 
+" F2 F3 save and switch
+nnoremap <silent> <F2> :wa<CR>:bp<CR>
+nnoremap <silent> <F3> :wa<CR>:bn<CR>
+vmap <F2> <ESC><F2>
+imap <F2> <ESC><F2>
+tmap <F2> <ESC><F2>
+vmap <F3> <ESC><F3>
+imap <F3> <ESC><F3>
+tmap <F3> <ESC><F3>
 " to exit quickly
+
 nnoremap Q q
 vmap Q <ESC>Q
 nnoremap <silent> q :call <SID>uni_wq()<CR>
@@ -352,21 +371,22 @@ endif
 
 
 function! s:uni_wq() abort
-    let l:nr = win_getid()
-    let l:wi = getwininfo(l:nr)[0]
-    let l:ty = &buftype
-    if l:ty == 'popup'
-        FloatermKill
-    elseif l:ty == 'quickfix'
-        q " cclose
-    elseif l:wi.terminal == 1
-        if exists('b:floaterm_cmd')
-            FloatermKill
-        else
-            q!
-        endif
-    else
-        wa!
-        q!
-    endif
+	let l:nr = win_getid()
+	let l:wi = getwininfo(l:nr)[0]
+	let l:ty = &buftype
+	:NERDTreeClose
+	if l:ty == 'popup'
+		FloatermKill
+	elseif l:ty == 'quickfix'
+		q " cclose
+	elseif l:wi.terminal == 1
+		if exists('b:floaterm_cmd')
+			FloatermKill
+		else
+			q!
+		endif
+	else
+		wa!
+		q!
+	endif
 endfunction

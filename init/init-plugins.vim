@@ -147,8 +147,8 @@ if index(g:bundle_group, 'basic') >= 0
 
 	" git 仓库使用 histogram 算法进行 diff
 	let g:signify_vcs_cmds = {
-			\ 'git': 'git diff --no-color --diff-algorithm=histogram --no-ext-diff -U0 -- %f',
-			\}
+				\ 'git': 'git diff --no-color --diff-algorithm=histogram --no-ext-diff -U0 -- %f',
+				\}
 endif
 
 
@@ -177,7 +177,7 @@ if index(g:bundle_group, 'enhanced') >= 0
 
 	" 提供 gist 接口
 	Plug 'lambdalisue/vim-gista', { 'on': 'Gista' }
-	
+
 	" ALT_+/- 用于按分隔符扩大缩小 v 选区
 	map <m-=> <Plug>(expand_region_expand)
 	map <m--> <Plug>(expand_region_shrink)
@@ -276,6 +276,9 @@ if index(g:bundle_group, 'filetypes') >= 0
 	" C++ complete
 	Plug 'neoclide/coc.nvim', {'branch': 'release'}
 
+	"Vista 
+	Plug 'liuchengxu/vista.vim'
+
 	" 额外语法文件
 	Plug 'justinmk/vim-syntax-extra', { 'for': ['c', 'bison', 'flex', 'cpp'] }
 
@@ -318,15 +321,23 @@ endif
 if index(g:bundle_group, 'nerdtree') >= 0
 	Plug 'scrooloose/nerdtree', {'on': ['NERDTree', 'NERDTreeFocus', 'NERDTreeToggle', 'NERDTreeCWD', 'NERDTreeFind'] }
 	Plug 'tiagofumo/vim-nerdtree-syntax-highlight'
+	Plug 'xuyuanp/nerdtree-git-plugin', {'on': 'NERDTreeToggle'}
 	let g:NERDTreeMinimalUI = 1
 	let g:NERDTreeDirArrows = 1
 	let g:NERDTreeHijackNetrw = 0
-	noremap <space>nn :NERDTree<cr>
-	noremap <space>no :NERDTreeFocus<cr>
-	noremap <space>nm :NERDTreeMirror<cr>
-	noremap <space>nt :NERDTreeToggle<cr>
+	" Start NERDTree and put the cursor back in the other window.
+	autocmd VimEnter * NERDTree | wincmd p
+	" Open the existing NERDTree on each new tab.
+	" autocmd BufWinEnter * if getcmdwintype() == '' | silent NERDTreeMirror | endif
+	" Exit Vim if NERDTree is the only window left.
+	autocmd BufEnter * if winnr('$') == 1 && exists('b:NERDTree') && b:NERDTree.isTabTree() | quit | endif
+	"autocmd BufEnter * if tabpagenr('$') > 1 && !len(filter(tabpagebuflist(), 'getbufvar(v:val,"&ft") != "nerdtree"')) | tabclose | endif
+	
+	"noremap <space>nn :NERDTree<cr>
+	"noremap <space>no :NERDTreeFocus<cr>
+	"noremap <space>nm :NERDTreeMirror<cr>
 endif
-
+let NERDTreeMapActivateNode='v'
 
 "----------------------------------------------------------------------
 " LanguageTool 语法检查
@@ -484,13 +495,13 @@ if index(g:bundle_group, 'leaderf') >= 0
 
 		" 使用 ESC 键可以直接退出 leaderf 的 normal 模式
 		let g:Lf_NormalMap = {
-				\ "File":   [["<ESC>", ':exec g:Lf_py "fileExplManager.quit()"<CR>']],
-				\ "Buffer": [["<ESC>", ':exec g:Lf_py "bufExplManager.quit()"<cr>']],
-				\ "Mru": [["<ESC>", ':exec g:Lf_py "mruExplManager.quit()"<cr>']],
-				\ "Tag": [["<ESC>", ':exec g:Lf_py "tagExplManager.quit()"<cr>']],
-				\ "BufTag": [["<ESC>", ':exec g:Lf_py "bufTagExplManager.quit()"<cr>']],
-				\ "Function": [["<ESC>", ':exec g:Lf_py "functionExplManager.quit()"<cr>']],
-				\ }
+					\ "File":   [["<ESC>", ':exec g:Lf_py "fileExplManager.quit()"<CR>']],
+					\ "Buffer": [["<ESC>", ':exec g:Lf_py "bufExplManager.quit()"<cr>']],
+					\ "Mru": [["<ESC>", ':exec g:Lf_py "mruExplManager.quit()"<cr>']],
+					\ "Tag": [["<ESC>", ':exec g:Lf_py "tagExplManager.quit()"<cr>']],
+					\ "BufTag": [["<ESC>", ':exec g:Lf_py "bufTagExplManager.quit()"<cr>']],
+					\ "Function": [["<ESC>", ':exec g:Lf_py "functionExplManager.quit()"<cr>']],
+					\ }
 
 	else
 		" 不支持 python ，使用 CtrlP 代替
@@ -504,10 +515,10 @@ if index(g:bundle_group, 'leaderf') >= 0
 
 		" 模糊匹配忽略
 		let g:ctrlp_custom_ignore = {
-		  \ 'dir':  '\v[\/]\.(git|hg|svn)$',
-		  \ 'file': '\v\.(exe|so|dll|mp3|wav|sdf|suo|mht)$',
-		  \ 'link': 'some_bad_symbolic_links',
-		  \ }
+					\ 'dir':  '\v[\/]\.(git|hg|svn)$',
+					\ 'file': '\v\.(exe|so|dll|mp3|wav|sdf|suo|mht)$',
+					\ 'link': 'some_bad_symbolic_links',
+					\ }
 
 		" 项目标志
 		let g:ctrlp_root_markers = ['.project', '.root', '.svn', '.git']
@@ -552,26 +563,26 @@ set signcolumn=yes
 " NOTE: Use command ':verbose imap <tab>' to make sure tab is not mapped by
 " other plugin before putting this into your config
 inoremap <silent><expr> <TAB>
-      \ coc#pum#visible() ? coc#pum#next(1) :
-      \ CheckBackspace() ? "\<Tab>" :
-      \ coc#refresh()
+			\ coc#pum#visible() ? coc#pum#next(1) :
+			\ CheckBackspace() ? "\<Tab>" :
+			\ coc#refresh()
 inoremap <expr><S-TAB> coc#pum#visible() ? coc#pum#prev(1) : "\<C-h>"
 
 " Make <CR> to accept selected completion item or notify coc.nvim to format
 " <C-g>u breaks current undo, please make your own choice
 inoremap <silent><expr> <CR> coc#pum#visible() ? coc#pum#confirm()
-                              \: "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
+			\: "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
 
 function! CheckBackspace() abort
-  let col = col('.') - 1
-  return !col || getline('.')[col - 1]  =~# '\s'
+	let col = col('.') - 1
+	return !col || getline('.')[col - 1]  =~# '\s'
 endfunction
 
 " Use <c-space> to trigger completion
 if has('nvim')
-  inoremap <silent><expr> <c-space> coc#refresh()
+	inoremap <silent><expr> <c-space> coc#refresh()
 else
-  inoremap <silent><expr> <c-@> coc#refresh()
+	inoremap <silent><expr> <c-@> coc#refresh()
 endif
 
 " Use `[g` and `]g` to navigate diagnostics
@@ -589,11 +600,11 @@ nmap <silent> gr <Plug>(coc-references)
 nnoremap <silent> K :call ShowDocumentation()<CR>
 
 function! ShowDocumentation()
-  if CocAction('hasProvider', 'hover')
-    call CocActionAsync('doHover')
-  else
-    call feedkeys('K', 'in')
-  endif
+	if CocAction('hasProvider', 'hover')
+		call CocActionAsync('doHover')
+	else
+		call feedkeys('K', 'in')
+	endif
 endfunction
 
 " Highlight the symbol and its references when holding the cursor
@@ -607,11 +618,11 @@ xmap <leader>f  <Plug>(coc-format-selected)
 nmap <leader>f  <Plug>(coc-format-selected)
 
 augroup mygroup
-  autocmd!
-  " Setup formatexpr specified filetype(s)
-  autocmd FileType typescript,json setl formatexpr=CocAction('formatSelected')
-  " Update signature help on jump placeholder
-  autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
+	autocmd!
+	" Setup formatexpr specified filetype(s)
+	autocmd FileType typescript,json setl formatexpr=CocAction('formatSelected')
+	" Update signature help on jump placeholder
+	autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
 augroup end
 
 " Applying code actions to the selected code block
@@ -647,12 +658,12 @@ omap ac <Plug>(coc-classobj-a)
 
 " Remap <C-f> and <C-b> to scroll float windows/popups
 if has('nvim-0.4.0') || has('patch-8.2.0750')
-  nnoremap <silent><nowait><expr> <C-f> coc#float#has_scroll() ? coc#float#scroll(1) : "\<C-f>"
-  nnoremap <silent><nowait><expr> <C-b> coc#float#has_scroll() ? coc#float#scroll(0) : "\<C-b>"
-  inoremap <silent><nowait><expr> <C-f> coc#float#has_scroll() ? "\<c-r>=coc#float#scroll(1)\<cr>" : "\<Right>"
-  inoremap <silent><nowait><expr> <C-b> coc#float#has_scroll() ? "\<c-r>=coc#float#scroll(0)\<cr>" : "\<Left>"
-  vnoremap <silent><nowait><expr> <C-f> coc#float#has_scroll() ? coc#float#scroll(1) : "\<C-f>"
-  vnoremap <silent><nowait><expr> <C-b> coc#float#has_scroll() ? coc#float#scroll(0) : "\<C-b>"
+	nnoremap <silent><nowait><expr> <C-f> coc#float#has_scroll() ? coc#float#scroll(1) : "\<C-f>"
+	nnoremap <silent><nowait><expr> <C-b> coc#float#has_scroll() ? coc#float#scroll(0) : "\<C-b>"
+	inoremap <silent><nowait><expr> <C-f> coc#float#has_scroll() ? "\<c-r>=coc#float#scroll(1)\<cr>" : "\<Right>"
+	inoremap <silent><nowait><expr> <C-b> coc#float#has_scroll() ? "\<c-r>=coc#float#scroll(0)\<cr>" : "\<Left>"
+	vnoremap <silent><nowait><expr> <C-f> coc#float#has_scroll() ? coc#float#scroll(1) : "\<C-f>"
+	vnoremap <silent><nowait><expr> <C-b> coc#float#has_scroll() ? coc#float#scroll(0) : "\<C-b>"
 endif
 
 " Use CTRL-S for selections ranges

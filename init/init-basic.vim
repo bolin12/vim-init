@@ -40,7 +40,8 @@ set ttimeoutlen=50
 
 " 显示光标位置
 set ruler
-
+" mouse open
+set mouse=a
 
 "----------------------------------------------------------------------
 " 搜索设置
@@ -52,8 +53,8 @@ set ignorecase
 " 智能搜索大小写判断，默认忽略大小写，除非搜索内容包含大写字母
 set smartcase
 
-" 高亮搜索内容
-set hlsearch
+" no 高亮搜索内容
+set nohlsearch
 
 " 查找输入时动态增量显示查找结果
 set incsearch

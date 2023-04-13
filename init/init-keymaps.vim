@@ -29,6 +29,8 @@ inoremap <c-_> <c-k>
 " 设置 CTRL+HJKL 移动光标（INSERT 模式偶尔需要移动的方便些）
 " 使用 SecureCRT/XShell 等终端软件需设置：Backspace sends delete
 " 详见：http://www.skywind.me/blog/archives/2021
+" Alt+HJKL small step
+" CTRL+HJKL large step
 "----------------------------------------------------------------------
 noremap <C-h> <left>
 noremap <C-j> <down>
@@ -252,9 +254,23 @@ nnoremap <silent> <F8> :AsyncRun -cwd=<root> -raw make run <cr>
 " F6 测试项目
 nnoremap <silent> <F6> :AsyncRun -cwd=<root> -raw make test <cr>
 
-" 更新 cmake
-nnoremap <silent> <F4> :AsyncRun -cwd=<root> cmake . <cr>
+" cancel 更新 cmake
+"nnoremap <silent> <F4> :AsyncRun -cwd=<root> cmake . <cr>
+" F4 quick save
+nnoremap <silent> <F4> :wa<CR>
+vmap <F4> <ESC><F4>
+imap <F4> <ESC><F4>
+tmap <F4> <ESC><F4>
 
+" to exit quickly
+nnoremap Q q
+vmap Q <ESC>Q
+nnoremap <silent> q :call <SID>uni_wq()<CR>
+vmap q <ESC>q
+nnoremap <silent> <C-q> :call <SID>uni_bd()<CR>
+vmap <C-q> <ESC><C-q>
+imap <C-q> <ESC><C-q>
+tmap <C-q> <ESC><C-q>
 " Windows 下支持直接打开新 cmd 窗口运行
 if has('win32') || has('win64')
 	nnoremap <silent> <F8> :AsyncRun -cwd=<root> -mode=4 make run <cr>
@@ -330,4 +346,27 @@ else
 				\ '<root>' <cr>
 endif
 
+"--------------------------------------------------------------------------
+"							Functions
+"--------------------------------------------------------------------------
 
+
+function! s:uni_wq() abort
+    let l:nr = win_getid()
+    let l:wi = getwininfo(l:nr)[0]
+    let l:ty = &buftype
+    if l:ty == 'popup'
+        FloatermKill
+    elseif l:ty == 'quickfix'
+        q " cclose
+    elseif l:wi.terminal == 1
+        if exists('b:floaterm_cmd')
+            FloatermKill
+        else
+            q!
+        endif
+    else
+        wa!
+        q!
+    endif
+endfunction
